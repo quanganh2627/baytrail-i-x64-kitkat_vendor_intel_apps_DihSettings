@@ -27,5 +27,13 @@
             <meta-data android:name="com.android.settings.title" android:resource="@string/dualdisplay_settings"/>
         </activity>
         
+       <activity android:name="ExternalDisplayRotationSettings" android:label="@string/external_display_rotation_settings">
+             <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="com.intel.settings.DualDisplay_ROTATION" />
+                <meta-data android:name="com.android.settings.icon" android:resource="@drawable/ic_settings_hdmi"/>
+                <meta-data android:name="com.android.settings.title" android:resource="@string/external_display_rotation_settings"/>
+            </intent-filter>
+       </activity>
     </application>
 </manifest>
