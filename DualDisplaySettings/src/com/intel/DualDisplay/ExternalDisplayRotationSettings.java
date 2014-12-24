@@ -22,8 +22,16 @@ public class ExternalDisplayRotationSettings extends AlertActivity implements On
     protected FrameLayout mContentFrame;
     public RadioButton mPortrait;
     public RadioButton mLandscape;
+
+    public RadioButton mMainPortrait;
+    public RadioButton mMainLandscape;
+
     public String mSelectedRotation;
     public String mOldSelectedRotation;
+
+    public String mOldMainSelectedRotation;
+    public String mMainSelectedRotation;
+
     public String ROTATION_PORTRAIT = "portrait";
     public String ROTATION_LANDSCAPE = "landscape";
     public boolean mSettingChange = false;
@@ -38,8 +46,16 @@ public class ExternalDisplayRotationSettings extends AlertActivity implements On
         setHeading(R.string.external_display_rotation_settings);
         mPortrait = (RadioButton) findViewById(R.id.radioButtonPortrait);
         mLandscape = (RadioButton) findViewById(R.id.radioButtonLandscape);
+
+        mMainPortrait = (RadioButton) findViewById(R.id.radioButtonMainPortrait);
+        mMainLandscape = (RadioButton) findViewById(R.id.radioButtonMainLandscape);
+
         mPortrait.setOnCheckedChangeListener(this);
         mLandscape.setOnCheckedChangeListener(this);
+
+	 mMainPortrait.setOnCheckedChangeListener(this);
+        mMainLandscape.setOnCheckedChangeListener(this);
+
         mOldSelectedRotation = Settings.System.getStringForUser(getContentResolver(),
                 Settings.System.DISPLAY_ROTATION_ON_EXTERNAL,UserHandle.USER_CURRENT);
 	    if(mOldSelectedRotation.equals(ROTATION_PORTRAIT)){
@@ -49,7 +65,16 @@ public class ExternalDisplayRotationSettings extends AlertActivity implements On
             mPortrait.setChecked(false);
             mLandscape.setChecked(true);
 	    }
-	    
+
+        mOldMainSelectedRotation = Settings.System.getStringForUser(getContentResolver(),
+                Settings.System.DISPLAY_ROTATION_ON_MAIN,UserHandle.USER_CURRENT);
+	    if(mOldMainSelectedRotation.equals(ROTATION_PORTRAIT)){
+                mMainPortrait.setChecked(true);
+                mMainLandscape.setChecked(false);
+	    }else{
+            mMainPortrait.setChecked(false);
+            mMainLandscape.setChecked(true);
+	    }
     }
 
     public void setHeading(int titleRes) {
@@ -68,12 +93,19 @@ public class ExternalDisplayRotationSettings extends AlertActivity implements On
       @Override
     protected void onStop() {
         super.onStop();
-        if(mSelectedRotation==null||mSelectedRotation.isEmpty())
+        if(mSelectedRotation==null||mSelectedRotation.isEmpty()
+			|| mMainSelectedRotation ==null||mMainSelectedRotation.isEmpty())
         	return;
         mSettingChange = !mOldSelectedRotation.equals(mSelectedRotation);
         if(mSettingChange){
             Settings.System.putString(getContentResolver(),
                 Settings.System.DISPLAY_ROTATION_ON_EXTERNAL,mSelectedRotation);
+//	         Toast.makeText(this,"You must reboot devices to apply the change",Toast.LENGTH_SHORT).show();
+        }
+	 mSettingChange = !mOldMainSelectedRotation.equals(mMainSelectedRotation);
+        if(mSettingChange){
+            Settings.System.putString(getContentResolver(),
+                Settings.System.DISPLAY_ROTATION_ON_MAIN,mMainSelectedRotation);
 //	         Toast.makeText(this,"You must reboot devices to apply the change",Toast.LENGTH_SHORT).show();
         }
     }
@@ -101,7 +133,20 @@ public class ExternalDisplayRotationSettings extends AlertActivity implements On
 				mSelectedRotation = ROTATION_LANDSCAPE;
 			}
 		}
-		
-	}
+
+		if(arg0 == mMainPortrait){
+		    if(arg1){
+                     mMainLandscape.setChecked(false);
+                     mMainSelectedRotation = ROTATION_PORTRAIT;
+                  }
+             }
+             if(arg0 ==mMainLandscape ){
+                  if(arg1){
+                      mMainPortrait.setChecked(false);
+                      mMainSelectedRotation = ROTATION_LANDSCAPE;
+                  }
+              }
+
+         }
 
 }

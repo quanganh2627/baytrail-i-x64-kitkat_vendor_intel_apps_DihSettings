@@ -42,8 +42,12 @@
     
     <string name="btn_cancel">Cancel</string>
     
-    <string name="portrait">portrait</string>
+    <string name="portrait">portrait on external</string>
 
-    <string name="landscape">landscape</string>
+    <string name="landscape">landscape on external</string>
+
+    <string name="main_portrait">portrait on main</string>
+
+    <string name="main_landscape">landscape on main</string>
 </resources>
 
