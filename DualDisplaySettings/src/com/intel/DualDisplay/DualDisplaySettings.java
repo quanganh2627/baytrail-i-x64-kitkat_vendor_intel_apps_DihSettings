@@ -93,7 +93,6 @@ public class DualDisplaySettings extends ListActivity implements OnClickListener
 		mIconResizer = new IconResizer();
 		mIntent = new Intent();
 		mIntent.setAction(Intent.ACTION_MAIN);
-		mIntent.addCategory(Intent.CATEGORY_DEFAULT);
 		mIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 		
 		mAdapter = new ActivityAdapter(mIconResizer,this);
