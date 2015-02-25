@@ -16,14 +16,14 @@
         android:layout_height="wrap_content"
         android:text="@string/landscape" />
 
-    <RadioButton
-        android:id="@+id/radioButtonMainPortrait"
+    <CheckBox
+        android:id="@+id/checkboxMainPortrait"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/main_portrait" />
 
-    <RadioButton
-        android:id="@+id/radioButtonMainLandscape"
+    <CheckBox
+        android:id="@+id/checkboxMainLandscape"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/main_landscape" />
