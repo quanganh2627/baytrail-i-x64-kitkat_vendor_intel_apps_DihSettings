@@ -81,6 +81,7 @@ public class ExternalDisplayRotationSettings extends AlertActivity implements On
         }else{
               mMainPortrait.setChecked(false);
               mMainLandscape.setChecked(false);
+              mMainSelectedRotation = ROTATION_NONE;
          }
     }
 
@@ -100,15 +101,18 @@ public class ExternalDisplayRotationSettings extends AlertActivity implements On
       @Override
     protected void onStop() {
         super.onStop();
-        if(mSelectedRotation==null||mSelectedRotation.isEmpty()
-             || mMainSelectedRotation ==null||mMainSelectedRotation.isEmpty())
+        if(mSelectedRotation==null||mSelectedRotation.isEmpty())
             return;
+
         mSettingChange = !mOldSelectedRotation.equals(mSelectedRotation);
         if(mSettingChange){
             Settings.System.putString(getContentResolver(),
                 Settings.System.DISPLAY_ROTATION_ON_EXTERNAL,mSelectedRotation);
 //         Toast.makeText(this,"You must reboot devices to apply the change",Toast.LENGTH_SHORT).show();
         }
+        if(mMainSelectedRotation ==null||mMainSelectedRotation.isEmpty())
+            return;
+
         mSettingChange = !mOldMainSelectedRotation.equals(mMainSelectedRotation);
         if(mSettingChange){
             Log.d(TAG,"Save mMainSelectedRotation to database :" + mMainSelectedRotation);
