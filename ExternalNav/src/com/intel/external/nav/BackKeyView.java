@@ -12,6 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * author: jianpingx.li@intel.com
+ * The back key view show on external display,This file copy from com.android.systemUi
+ * and delete some needless function.
+ *
  */
 
 package com.intel.external.nav;
@@ -54,7 +59,7 @@ import java.io.PrintWriter;
 
 public class BackKeyView extends LinearLayout {
     final static boolean DEBUG = false;
-    final static String TAG = "CSLauncher/BackKeyView";
+    final static String TAG = "PhoneStatusBar/NavigationBarView";
 
     final static boolean NAVBAR_ALWAYS_AT_RIGHT = true;
 

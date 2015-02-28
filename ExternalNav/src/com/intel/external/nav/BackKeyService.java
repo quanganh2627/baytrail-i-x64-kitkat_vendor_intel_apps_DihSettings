@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * author: jianpingx.li@intel.com
+ * A service to handle the back key view
+ *
  */
 
 package com.intel.external.nav;
@@ -70,23 +74,6 @@ public class BackKeyService extends Service {
 
      @Override
     public void onCreate() {
-        /*
-        //Make a back key view
-        DisplayManagerGlobal dm = DisplayManagerGlobal.getInstance();
-        DisplayManager dmM = (DisplayManager)this.getSystemService(
-                                Context.DISPLAY_SERVICE);
-        Context baseContext;
-        for (int displayId : dm.getDisplayIds()) {
-            if (displayId != Display.DEFAULT_DISPLAY) {
-                Log.w(TAG, "angela000===oncreate displayId:"+displayId);
-                Display display = dmM.getDisplay(displayId);
-                DisplayId = displayId; 
-                baseContext = this.createDisplayContext(display);
-                attachBaseContext(baseContext);
-                break;
-            }
-        }
-        */
         makeBackKeyView();
     }
 

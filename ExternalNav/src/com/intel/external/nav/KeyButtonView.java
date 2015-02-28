@@ -12,6 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * author: jianpingx.li@intel.com
+ * This file copy from com.android.systemUi, Call function finishActivityOnExternalDisplay
+ * When it is clicked.
+ *
  */
 
 package com.intel.external.nav;
@@ -45,7 +50,7 @@ import android.os.RemoteException;
 //import com.android.systemui.R;
 
 public class KeyButtonView extends ImageView {
-    private static final String TAG = "CSLauncher.KeyButtonView";
+    private static final String TAG = "StatusBar.KeyButtonView";
     private static final boolean DEBUG = false;
 
     final float GLOW_MAX_SCALE_FACTOR = 1.8f;
@@ -71,7 +76,7 @@ public class KeyButtonView extends ImageView {
             if (isPressed()) {
                 // Log.d("KeyButtonView", "longpressed: " + this);
                 if (mCode != 0) {
-                    sendEvent(KeyEvent.ACTION_DOWN, KeyEvent.FLAG_LONG_PRESS, BackKeyService.DisplayId);
+                    sendEvent(KeyEvent.ACTION_DOWN, KeyEvent.FLAG_LONG_PRESS);
                     sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_LONG_CLICKED);
                 } else {
                     // Just an old-fashioned ImageView
@@ -240,13 +245,13 @@ public class KeyButtonView extends ImageView {
                 Log.d("KeyButtonView", "press");
                 mDownTime = SystemClock.uptimeMillis();
                 setPressed(true);
-		   try {
-		        ActivityManagerNative.getDefault().finishActivityOnExternalDisplay();
-			 } catch (RemoteException re) {
+                try {
+                     ActivityManagerNative.getDefault().finishActivityOnExternalDisplay();
+                     } catch (RemoteException re) {
                     // Shouldn't happen
                 }
                 if (mCode != 0) {
-                    sendEvent(KeyEvent.ACTION_DOWN, 0, mDownTime, BackKeyService.DisplayId);
+                    sendEvent(KeyEvent.ACTION_DOWN, 0, mDownTime);
                 } else {
                     // Provide the same haptic feedback that the system offers for virtual keys.
                     performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
@@ -267,7 +272,7 @@ public class KeyButtonView extends ImageView {
             case MotionEvent.ACTION_CANCEL:
                 setPressed(false);
                 if (mCode != 0) {
-                    sendEvent(KeyEvent.ACTION_UP, KeyEvent.FLAG_CANCELED, BackKeyService.DisplayId);
+                    sendEvent(KeyEvent.ACTION_UP, KeyEvent.FLAG_CANCELED);
                 }
                 if (mSupportsLongpress) {
                     removeCallbacks(mCheckLongPress);
@@ -278,11 +283,11 @@ public class KeyButtonView extends ImageView {
                 setPressed(false);
                 if (mCode != 0) {
                     if (doIt) {
-                        sendEvent(KeyEvent.ACTION_UP, 0, BackKeyService.DisplayId);
+                        sendEvent(KeyEvent.ACTION_UP, 0);
                         sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_CLICKED);
                         playSoundEffect(SoundEffectConstants.CLICK);
                     } else {
-                        sendEvent(KeyEvent.ACTION_UP, KeyEvent.FLAG_CANCELED, BackKeyService.DisplayId);
+                        sendEvent(KeyEvent.ACTION_UP, KeyEvent.FLAG_CANCELED);
                     }
                 } else {
                     // no key code, just a regular ImageView
@@ -299,23 +304,22 @@ public class KeyButtonView extends ImageView {
         return true;
     }
 
-    void sendEvent(int action, int flags, int displayId) {
-        sendEvent(action, flags, SystemClock.uptimeMillis(), displayId);
+    void sendEvent(int action, int flags) {
+        sendEvent(action, flags, SystemClock.uptimeMillis());
     }
 
-    void sendEvent(int action, int flags, long when, int displayId) {
-/*		
+    void sendEvent(int action, int flags, long when) {
+/*
         final int repeatCount = (flags & KeyEvent.FLAG_LONG_PRESS) != 0 ? 1 : 0;
         final KeyEvent ev = new KeyEvent(mDownTime, when, action, mCode, repeatCount,
                 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0,
                 flags | KeyEvent.FLAG_FROM_SYSTEM | KeyEvent.FLAG_VIRTUAL_HARD_KEY,
                 InputDevice.SOURCE_KEYBOARD);
         InputManager.getInstance().injectInputEvent(ev,
-                InputManager.INJECT_INPUT_EVENT_MODE_ASYNC, displayId);
- */
-        
-    }
+                InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
+*/
 
+    }
 }
 
 
