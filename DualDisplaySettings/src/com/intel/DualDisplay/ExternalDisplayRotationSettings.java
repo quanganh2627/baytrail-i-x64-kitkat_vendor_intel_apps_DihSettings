@@ -1,10 +1,16 @@
 package com.intel.DualDisplay;
 
 import android.app.Activity;
+import android.content.Context;
+import android.hardware.display.DisplayManager;
+import android.hardware.display.DisplayManager.DisplayListener;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.UserHandle;
 import android.provider.Settings;
+import android.view.Display;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -39,6 +45,10 @@ public class ExternalDisplayRotationSettings extends AlertActivity implements On
     public String ROTATION_LANDSCAPE = "landscape";
     public String ROTATION_NONE = "none";
     public boolean mSettingChange = false;
+    public DisplayManager mDisplayManager;
+    final public int mMinDisplayCount = 2;
+    public int mDisplayCount = 0;
+    public Handler mHandler = new Handler();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +64,9 @@ public class ExternalDisplayRotationSettings extends AlertActivity implements On
         mMainPortrait = (CheckBox) findViewById(R.id.checkboxMainPortrait);
         mMainLandscape = (CheckBox) findViewById(R.id.checkboxMainLandscape);
 
+        mDisplayManager = (DisplayManager)getSystemService(Context.DISPLAY_SERVICE);
+        mDisplayManager.registerDisplayListener(mDsiplayLlistener,mHandler);
+        mDisplayCount = mDisplayManager.getDisplays().length;
         mPortrait.setOnCheckedChangeListener(this);
         mLandscape.setOnCheckedChangeListener(this);
 
@@ -82,7 +95,12 @@ public class ExternalDisplayRotationSettings extends AlertActivity implements On
               mMainPortrait.setChecked(false);
               mMainLandscape.setChecked(false);
               mMainSelectedRotation = ROTATION_NONE;
-         }
+        }
+
+        if(mDisplayCount < mMinDisplayCount){
+           mPortrait.setClickable(false);
+           mLandscape.setClickable(false);
+        }
     }
 
     public void setHeading(int titleRes) {
@@ -97,6 +115,35 @@ public class ExternalDisplayRotationSettings extends AlertActivity implements On
         mContentFrame.removeAllViews();
         getLayoutInflater().inflate(layoutRes, mContentFrame);
     }
+
+    DisplayListener mDsiplayLlistener = new DisplayListener(){
+
+       @Override
+       public void onDisplayAdded(int arg0) {
+         // TODO Auto-generated method stub
+         mDisplayCount =  mDisplayManager.getDisplays().length;
+         if(mDisplayCount >= mMinDisplayCount ){
+             mPortrait.setClickable(true);
+             mLandscape.setClickable(true);
+         }
+       }
+
+       @Override
+       public void onDisplayChanged(int arg0) {
+         // TODO Auto-generated method stub
+
+       }
+
+       @Override
+       public void onDisplayRemoved(int arg0) {
+         // TODO Auto-generated method stub
+         mDisplayCount =  mDisplayManager.getDisplays().length;
+         if(mDisplayCount < mMinDisplayCount ){
+            mPortrait.setClickable(false);
+            mLandscape.setClickable(false);
+         }
+      }
+   };
 
       @Override
     protected void onStop() {
@@ -165,4 +212,5 @@ public class ExternalDisplayRotationSettings extends AlertActivity implements On
              }
           }
       }
+
 }
