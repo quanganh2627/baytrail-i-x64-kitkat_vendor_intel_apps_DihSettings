@@ -24,11 +24,15 @@ import android.os.Bundle;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.LayoutInflater.Filter;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -75,42 +79,79 @@ public class DualDisplaySettings extends ListActivity implements OnClickListener
 
         public ListItem() {
         }
-     	}
-	  
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
-		
-		mStoredAppName = Settings.System.getStringForUser(getContentResolver(),
+     }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+
+        mStoredAppName = Settings.System.getStringForUser(getContentResolver(),
                 Settings.System.APP_DISPLAY_ON_EXTERNAL,UserHandle.USER_CURRENT);
-		btn_ok = (Button)findViewById(R.id.btn_ok);
-		btn_cancel = (Button)findViewById(R.id.btn_cancel);
-		btn_ok.setOnClickListener(this);
-		btn_cancel.setOnClickListener(this);
-		mPackageManager = getPackageManager();
-		mIconResizer = new IconResizer();
-		mIntent = new Intent();
-		mIntent.setAction(Intent.ACTION_MAIN);
-		mIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-		
-		mAdapter = new ActivityAdapter(mIconResizer,this);
-		setListAdapter(mAdapter);
+        btn_ok = (Button)findViewById(R.id.btn_ok);
+        btn_cancel = (Button)findViewById(R.id.btn_cancel);
+        btn_ok.setOnClickListener(this);
+        btn_cancel.setOnClickListener(this);
+        mPackageManager = getPackageManager();
+        mIconResizer = new IconResizer();
+        mIntent = new Intent();
+        mIntent.setAction(Intent.ACTION_MAIN);
+        mIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 
-		listView = getListView();
-		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-	}
+        mAdapter = new ActivityAdapter(mIconResizer,this);
+        setListAdapter(mAdapter);
+        listView = getListView();
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        listView.setMultiChoiceModeListener(mListener);
+    }
+    public void setItemChecked(int position){
+        listView.setItemChecked(position,true);
+    }
 
-	public void setItemChecked(int position){
-             listView.setItemChecked(position,true);
-	}
+    @Override
+    public void onBackPressed() {
+        // TODO Auto-generated method stub
+        super.onBackPressed();
+    }
 
-	@Override
-	public void onBackPressed() {
-		// TODO Auto-generated method stub
-		super.onBackPressed();
-	}
+    MultiChoiceModeListener mListener = new MultiChoiceModeListener(){
+
+        @Override
+        public boolean onActionItemClicked(ActionMode arg0, MenuItem arg1) {
+        // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode arg0, Menu arg1) {
+        // TODO Auto-generated method stub
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode arg0) {
+        // TODO Auto-generated method stub
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode arg0, Menu arg1) {
+        // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public void onItemCheckedStateChanged(ActionMode arg0, int pos,
+            long id, boolean checked) {
+            // TODO Auto-generated method stub
+            //unchecked, so we should assume that use want delete it from the checked list,
+            //So we should delete the package name from the stored list
+            ListItem item = (ListItem)mAdapter.getItem((int) id);
+            if(!checked && mStoredAppName.contains(item.packageName)){
+               mStoredAppName = mStoredAppName.replaceAll( item.packageName + ":", "");
+            }
+          }
+        };
 
 
    private class ActivityAdapter extends BaseAdapter {
@@ -125,11 +166,11 @@ public class DualDisplaySettings extends ListActivity implements OnClickListener
         private Filter mFilter;
         private final boolean mShowIcons;
 
-	 private DualDisplaySettings mOwner;
+        private DualDisplaySettings mOwner;
         
         public ActivityAdapter(IconResizer resizer,DualDisplaySettings activity) {
             mIconResizer = resizer;
-	        mOwner = activity;
+            mOwner = activity;
             mInflater = (LayoutInflater)DualDisplaySettings. this.getSystemService(
                     Context.LAYOUT_INFLATER_SERVICE);
             mShowIcons = true;
@@ -156,11 +197,11 @@ public class DualDisplaySettings extends ListActivity implements OnClickListener
             } else {
                 view = convertView;
             }
-	     ListItem item = mActivitiesList.get(position);
-            bindView(view, item);
-	     if(mOwner.mStoredAppName != null && !mOwner.mStoredAppName.isEmpty() && mOwner.mStoredAppName.contains(item.packageName)){ 
-	           mOwner.setItemChecked(position);
-	     }
+         ListItem item = mActivitiesList.get(position);
+         bindView(view, item);
+         if(mOwner.mStoredAppName != null && !mOwner.mStoredAppName.isEmpty() && mOwner.mStoredAppName.contains(item.packageName)){
+            mOwner.setItemChecked(position);
+         }
             return view;
         }
 
@@ -175,11 +216,11 @@ public class DualDisplaySettings extends ListActivity implements OnClickListener
             }
         }
        
-	  public boolean hasStableIds(){
-               return true;
-	  }
-	  
-    }
+        public boolean hasStableIds(){
+            return true;
+        }
+
+   }
 
        /**
      * Utility class to resize icons to match default icon size.  
@@ -294,38 +335,36 @@ protected void onSortResultList(List<ResolveInfo> results) {
  * Perform the query to determine which results to show and return a list of them.
  */
 public List<ListItem> makeListItems() {
-	// Load all matching activities and sort correctly
-	List<ResolveInfo> list = onQueryPackageManager(mIntent);
-	onSortResultList(list);
+    // Load all matching activities and sort correctly
+    List<ResolveInfo> list = onQueryPackageManager(mIntent);
+    onSortResultList(list);
 
-	ArrayList<ListItem> result = new ArrayList<ListItem>(list.size());
-	int listSize = list.size();
-	for (int i = 0; i < listSize; i++) {
-		ResolveInfo resolveInfo = list.get(i);
-		result.add(new ListItem(mPackageManager, resolveInfo, null));
-	}
-
-	return result;
+    ArrayList<ListItem> result = new ArrayList<ListItem>(list.size());
+    int listSize = list.size();
+    for (int i = 0; i < listSize; i++) {
+        ResolveInfo resolveInfo = list.get(i);
+        result.add(new ListItem(mPackageManager, resolveInfo, null));
+    }
+    return result;
 }
 
 @Override
 public void onClick(View arg0) {
-	// TODO Auto-generated method stub
-	if(btn_ok == arg0){
-	   mStoredAppName = "";
-	   long[] selectedId = listView.getCheckItemIds();
-	   for(int n = 0;n<selectedId.length;n++){
-	   	ListItem item = (ListItem)mAdapter.getItem((int)selectedId[n]);
-		mStoredAppName = mStoredAppName + item.packageName + ":";
-		
-	   }
-          Settings.System.putString(getContentResolver(),
-                Settings.System.APP_DISPLAY_ON_EXTERNAL,mStoredAppName);
-	   finish();
-	}else if(btn_cancel == arg0){
-		finish();
-	}
-	
+    // TODO Auto-generated method stub
+    if(btn_ok == arg0){
+       mStoredAppName = "";
+       long[] selectedId = listView.getCheckItemIds();
+       for(int n = 0;n<selectedId.length;n++){
+       ListItem item = (ListItem)mAdapter.getItem((int)selectedId[n]);
+       mStoredAppName = mStoredAppName + item.packageName + ":";
+    }
+       Settings.System.putString(getContentResolver(),
+             Settings.System.APP_DISPLAY_ON_EXTERNAL,mStoredAppName);
+    finish();
+    }else if(btn_cancel == arg0){
+       finish();
+    }
+
 }
 
 }
